@@ -30,18 +30,37 @@ def get_chat_model(temperature: float = 0.0, model: Optional[str] = None):
             temperature=temperature,
         )
 
-    if PROVIDER in ("openai", "deepseek"):
+    if PROVIDER == "deepseek":
         from langchain_openai import ChatOpenAI
 
-        api_key = os.getenv("OPENAI_API_KEY") or os.getenv("DEEPSEEK_API_KEY")
-        base_url = os.getenv("OPENAI_BASE_URL") or os.getenv("DEEPSEEK_BASE_URL")
+        api_key = os.getenv("DEEPSEEK_API_KEY")
+        base_url = os.getenv("DEEPSEEK_BASE_URL")
+        model = model or os.getenv("DEEPSEEK_MODEL", "deepseek-chat")
         if not api_key:
             raise RuntimeError(
-                "未检测到 API key / no API key found. 请在 .env 中设置 OPENAI_API_KEY "
-                "或 DEEPSEEK_API_KEY，或将 LLM_PROVIDER 设为 ollama 使用本地模型。"
+                "未检测到 DeepSeek API key / no DeepSeek key found. 请在 .env 中设置 "
+                "DEEPSEEK_API_KEY 为真实密钥，或将 LLM_PROVIDER 设为 ollama 使用本地模型。"
             )
         return ChatOpenAI(
-            model=model or os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
+            model=model,
+            temperature=temperature,
+            api_key=api_key,
+            base_url=base_url,  # None 时走官方地址 / official endpoint when None
+        )
+
+    if PROVIDER == "openai":
+        from langchain_openai import ChatOpenAI
+
+        api_key = os.getenv("OPENAI_API_KEY")
+        base_url = os.getenv("OPENAI_BASE_URL")
+        model = model or os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+        if not api_key:
+            raise RuntimeError(
+                "未检测到 OpenAI API key / no OpenAI key found. 请在 .env 中设置 "
+                "OPENAI_API_KEY，或将 LLM_PROVIDER 设为 ollama 使用本地模型。"
+            )
+        return ChatOpenAI(
+            model=model,
             temperature=temperature,
             api_key=api_key,
             base_url=base_url,  # None 时走官方地址 / official endpoint when None
@@ -61,15 +80,31 @@ def get_embeddings(model: Optional[str] = None):
             model=model or os.getenv("OLLAMA_EMBED_MODEL", "nomic-embed-text"),
         )
 
-    if PROVIDER in ("openai", "deepseek"):
+    if PROVIDER == "deepseek":
+        # DeepSeek 不提供 embedding 接口，RAG 章节仍使用 OpenAI 兼容嵌入。
+        # DeepSeek has no embedding API; RAG examples fall back to OpenAI embeddings.
         from langchain_openai import OpenAIEmbeddings
 
-        api_key = os.getenv("OPENAI_API_KEY") or os.getenv("DEEPSEEK_API_KEY")
-        base_url = os.getenv("OPENAI_BASE_URL") or os.getenv("DEEPSEEK_BASE_URL")
+        api_key = os.getenv("OPENAI_API_KEY")
         if not api_key:
             raise RuntimeError(
-                "未检测到 API key / no API key found. 请在 .env 中设置 OPENAI_API_KEY "
-                "或 DEEPSEEK_API_KEY，或将 LLM_PROVIDER 设为 ollama 使用本地模型。"
+                "DeepSeek 无 embedding 接口 / DeepSeek has no embedding API. "
+                "请在 .env 中设置 OPENAI_API_KEY 用于 RAG，或将 LLM_PROVIDER 设为 ollama。"
+            )
+        return OpenAIEmbeddings(
+            model=model or os.getenv("OPENAI_EMBED_MODEL", "text-embedding-3-small"),
+            api_key=api_key,
+        )
+
+    if PROVIDER == "openai":
+        from langchain_openai import OpenAIEmbeddings
+
+        api_key = os.getenv("OPENAI_API_KEY")
+        base_url = os.getenv("OPENAI_BASE_URL")
+        if not api_key:
+            raise RuntimeError(
+                "未检测到 OpenAI API key / no OpenAI key found. 请在 .env 中设置 "
+                "OPENAI_API_KEY，或将 LLM_PROVIDER 设为 ollama 使用本地模型。"
             )
         return OpenAIEmbeddings(
             model=model or os.getenv("OPENAI_EMBED_MODEL", "text-embedding-3-small"),
