@@ -45,6 +45,7 @@ docs-preview:
 
 lint:
 	$(PYTHON) -m py_compile $$(find examples -name '*.py')
+	@echo "✓ 语法校验全部通过 / all examples passed"
 
 run:
 	$(PY) -m examples.p$(p).hello_chain
