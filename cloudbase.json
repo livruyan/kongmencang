@@ -1,0 +1,18 @@
+{
+  "envId": "<your-cloudbase-env-id>",
+  "framework": {
+    "name": "langgraph-crew",
+    "plugins": {
+      "crew-service": {
+        "use": "@cloudbase/framework-plugin-container",
+        "inputs": {
+          "serviceName": "crew-service",
+          "serviceType": "cloudrun",
+          "dockerfilePath": "Dockerfile",
+          "containerPort": 8000,
+          "buildDir": ""
+        }
+      }
+    }
+  }
+}

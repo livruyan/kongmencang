@@ -1,0 +1,82 @@
+"""统一 LLM Provider 抽象层 / Unified LLM Provider abstraction.
+
+读者只需在 .env 中设置 LLM_PROVIDER 与对应 key，即可在所有示例中无缝切换模型。
+Readers only need to set LLM_PROVIDER and the matching key in .env to switch
+models across every example.
+
+支持的 provider / Supported providers:
+  - openai   : 官方 OpenAI（默认 / default）
+  - deepseek : DeepSeek（OpenAI 兼容接口 / OpenAI-compatible）
+  - ollama   : 本地 Ollama（免 key / key-free，前几章推荐 / recommended early on）
+"""
+from typing import Optional
+
+import os
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
+PROVIDER = os.getenv("LLM_PROVIDER", "openai").lower()
+
+
+def get_chat_model(temperature: float = 0.0, model: Optional[str] = None):
+    """返回一个 LangChain ChatModel 实例 / Return a LangChain ChatModel."""
+    if PROVIDER == "ollama":
+        from langchain_ollama import ChatOllama
+
+        return ChatOllama(
+            model=model or os.getenv("OLLAMA_MODEL", "qwen2.5:7b"),
+            temperature=temperature,
+        )
+
+    if PROVIDER in ("openai", "deepseek"):
+        from langchain_openai import ChatOpenAI
+
+        api_key = os.getenv("OPENAI_API_KEY") or os.getenv("DEEPSEEK_API_KEY")
+        base_url = os.getenv("OPENAI_BASE_URL") or os.getenv("DEEPSEEK_BASE_URL")
+        if not api_key:
+            raise RuntimeError(
+                "未检测到 API key / no API key found. 请在 .env 中设置 OPENAI_API_KEY "
+                "或 DEEPSEEK_API_KEY，或将 LLM_PROVIDER 设为 ollama 使用本地模型。"
+            )
+        return ChatOpenAI(
+            model=model or os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
+            temperature=temperature,
+            api_key=api_key,
+            base_url=base_url,  # None 时走官方地址 / official endpoint when None
+        )
+
+    raise ValueError(
+        f"不支持的 LLM_PROVIDER / unsupported provider: {PROVIDER}"
+    )
+
+
+def get_embeddings(model: Optional[str] = None):
+    """返回一个嵌入模型 / Return an embeddings model (for RAG)."""
+    if PROVIDER == "ollama":
+        from langchain_ollama import OllamaEmbeddings
+
+        return OllamaEmbeddings(
+            model=model or os.getenv("OLLAMA_EMBED_MODEL", "nomic-embed-text"),
+        )
+
+    if PROVIDER in ("openai", "deepseek"):
+        from langchain_openai import OpenAIEmbeddings
+
+        api_key = os.getenv("OPENAI_API_KEY") or os.getenv("DEEPSEEK_API_KEY")
+        base_url = os.getenv("OPENAI_BASE_URL") or os.getenv("DEEPSEEK_BASE_URL")
+        if not api_key:
+            raise RuntimeError(
+                "未检测到 API key / no API key found. 请在 .env 中设置 OPENAI_API_KEY "
+                "或 DEEPSEEK_API_KEY，或将 LLM_PROVIDER 设为 ollama 使用本地模型。"
+            )
+        return OpenAIEmbeddings(
+            model=model or os.getenv("OPENAI_EMBED_MODEL", "text-embedding-3-small"),
+            api_key=api_key,
+            base_url=base_url,
+        )
+
+    raise ValueError(
+        f"不支持的 LLM_PROVIDER / unsupported provider: {PROVIDER}"
+    )

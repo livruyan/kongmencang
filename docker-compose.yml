@@ -1,0 +1,20 @@
+# Phase 9 部署：本地一键起 LangGraph Crew 服务
+# 用法：docker compose up --build
+# 服务读取同目录 .env（LLM_PROVIDER / 对应 key / 可选 LANGFUSE_*）
+services:
+  crew-service:
+    build: .
+    image: langgraph-course/crew-service:latest
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    restart: unless-stopped
+    # 如需把 Langfuse 也一起自托管，可解除下方注释并加上 langfuse 服务
+    # depends_on:
+    #   - langfuse
+    # langfuse:
+    #   image: langfuse/langfuse:latest
+    #   environment:
+    #     DATABASE_URL: postgresql://langfuse:langfuse@db:5432/langfuse
+    #   ...

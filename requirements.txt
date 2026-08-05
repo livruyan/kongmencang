@@ -1,0 +1,23 @@
+# LangChain 核心
+langchain>=0.3.0
+langchain-core>=0.3.0
+langchain-openai>=0.2.0
+langchain-ollama>=0.2.0
+langchain-community>=0.3.0
+
+# 向量检索（RAG 演示）
+faiss-cpu>=1.8.0
+
+# 图编排（Phase 6 起）
+langgraph>=0.2.0
+
+# 服务化（Phase 8 起）
+fastapi>=0.110.0
+uvicorn>=0.29.0
+
+# 环境变量加载
+python-dotenv>=1.0.0
+
+# 可观测性（Phase 8，项目决策：Langfuse 为主 / LangSmith 可选）
+langfuse>=2.0.0
+langsmith>=0.1.0

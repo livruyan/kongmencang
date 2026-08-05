@@ -1,0 +1,10 @@
+node_modules
+dist
+docs
+.vitepress/cache
+.vitepress/dist
+__pycache__
+*.pyc
+.git
+.gitignore
+.env

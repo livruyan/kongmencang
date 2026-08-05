@@ -1,0 +1,28 @@
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Virtual environments (managed by `make setup`)
+.venv/
+venv/
+env/
+
+# ===== Node / VitePress =====
+node_modules/
+docs/.vitepress/dist/
+docs/.vitepress/cache/
+docs/.vitepress/*.timestamp-*.mjs
+
+# ===== Secrets (NEVER commit real keys) =====
+.env
+.env.local
+.env.*.local
+
+# ===== Build / OS / Editor =====
+.DS_Store
+*.log
+.idea/
+*.swp
+.vscode/
