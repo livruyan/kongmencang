@@ -143,6 +143,8 @@ const enSidebar = [
 ]
 
 export default defineConfig({
+  // GitHub Pages 项目站点基路径（仓库名）。用户/组织根站点可留空。
+  base: '/langchain-langgraph-tutorial/',
   title: 'LangChain & LangGraph 系统化学习',
   description: '从底层范式理解 Agent 编排：状态图 + 节点 + 条件边',
   locales: {
@@ -187,7 +189,7 @@ export default defineConfig({
     },
   },
   themeConfig: {
-    socialLinks: [{ icon: 'github', link: 'https://github.com/' }],
+    socialLinks: [{ icon: 'github', link: 'https://github.com/ShadowQuill/langchain-langgraph-tutorial' }],
     search: {
       provider: 'local',
     },

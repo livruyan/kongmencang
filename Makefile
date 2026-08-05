@@ -7,7 +7,7 @@ VENV    ?= .venv
 PIP     := $(VENV)/bin/pip
 PY      := $(VENV)/bin/python
 
-.PHONY: help setup install-py install-docs docs docs-dev docs-preview lint run clean
+.PHONY: help setup install-py install-docs docs docs-dev docs-preview lint run clean deploy-docs
 
 help:
 	@echo "Targets:"
@@ -19,6 +19,7 @@ help:
 	@echo "  docs-preview  Preview the built site"
 	@echo "  lint          py_compile all examples"
 	@echo "  run p=N       Run Phase N hello example (e.g. make run p=1)"
+	@echo "  deploy-docs   Build docs then push main -> GitHub Actions deploys to Pages"
 	@echo "  clean         Remove venv, node_modules and build cache"
 
 setup: install-py install-docs
@@ -50,3 +51,9 @@ run:
 
 clean:
 	rm -rf $(VENV) node_modules docs/.vitepress/dist docs/.vitepress/cache
+
+# 构建文档并推送 main；GitHub Actions 会自动部署到 GitHub Pages。
+# 首次使用前需在仓库 Settings → Pages → Source 选择 "GitHub Actions"。
+deploy-docs:
+	npm run docs:build
+	git push origin main

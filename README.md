@@ -40,8 +40,8 @@ make lint         # 对所有示例做语法校验
 | 5 | 多 Agent 协作范式与主流框架对比 |
 | 6 | LangGraph 图编排核心 |
 | 7 | 状态、记忆与 Human-in-the-loop |
-| 8 | 多 Agent 工作流系统实战（Capstone） |
-| 9 | 生产部署实战 |
+| 8 | 生产部署实战 |
+| 9 | Capstone 综合实战与全景复盘 |
 
 ## 运行示例
 
@@ -67,6 +67,20 @@ npm install
 npm run docs:dev      # 开发预览
 npm run docs:build    # 构建静态站
 ```
+
+## 部署文档站（GitHub Pages）
+
+文档站通过 GitHub Actions 自动构建并部署到 GitHub Pages，无需手动上传。
+
+1. 在仓库 **Settings → Pages → Source** 选择 **GitHub Actions**（仅需设置一次）。
+2. 推送 `main` 分支即触发部署：
+   ```bash
+   make deploy-docs   # = npm run docs:build + git push origin main
+   ```
+3. 部署完成后，站点地址为：
+   `https://shadowquill.github.io/langchain-langgraph-tutorial/`
+
+> 部署工作流见 `.github/workflows/deploy-docs.yml`；`docs/.vitepress/config.ts` 中的 `base` 已按仓库名 `langchain-langgraph-tutorial` 配置好，无需改动。
 
 ## 示例运行环境说明
 
