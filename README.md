@@ -11,11 +11,27 @@
 - 本文档提供**双语**：简体中文（默认）与 English（`/en/`）。
 - This project is **bilingual**: Simplified Chinese (default) and English (`/en/`).
 
-## 前置准备：配置大模型（.env）
+## 快速开始（推荐一键）
 
-> ⚠️ **在跑「快速开始」之前必须先完成这一步。** 所有示例通过一个统一抽象层（`examples/common/llm.py`）按 `.env` 里的 `LLM_PROVIDER` 切换模型。如果没配置好就直接 `make run`，会因为连不上模型而报错（典型如 `httpx.ConnectError: [Errno 61] Connection refused`）。
+本仓库提供**编辑器无关**的 `Makefile`，在 PyCharm / WebStorm 终端、VS Code 或 CI 中都能直接运行：
 
-`.env` 会在 `make setup` 时自动从 `.env.example` 复制；你也可以手动 `cp .env.example .env` 后再编辑。下面二选一：
+```bash
+make setup        # 创建 .venv 并安装 Python + Node 依赖，复制 .env
+make docs         # 构建双语文档站 -> docs/.vitepress/dist
+make docs-dev     # 本地实时预览 http://localhost:5173
+make run p=1      # 运行 Phase 1 示例（p=2..9 同理，需先配置 .env，见下方「配置大模型」）
+make lint         # 对所有示例做语法校验
+```
+
+💡 **环境就绪后，先看文档再动手（推荐）**：上面 `make setup` 装好 Node 依赖后，运行 `make docs-dev`（或 `npm run docs:dev`）即可在浏览器打开 **http://localhost:5173** 阅读教程——文档站对每个 Phase 的原理、代码、验收清单都有详细说明。建议按 Phase 顺序读完对应章节，再回来 `make run p=N` 跑示例，效果更佳。
+
+> **IDE 用法（PyCharm + WebStorm）**：Python 代码用 PyCharm 打开项目根目录即可识别 `examples/`；文档站用 WebStorm 打开 `docs/`，或在 PyCharm 终端跑 `make docs-dev`。两者都自带 Terminal，可直接执行上面的 `make` 命令。
+>
+> 开发环境要求：Python 3.13+、Node 22+。
+
+## 配置大模型（.env）
+
+> ⚠️ **运行示例前必须完成这一步。** 上面的 `make setup` 已经自动从 `.env.example` 复制出了 `.env`，但它的默认值是 `LLM_PROVIDER=ollama`——如果你没启动本地 Ollama 就直接 `make run`，会报 `httpx.ConnectError: [Errno 61] Connection refused`。请按下面二选一编辑 `.env`（例如 `nano .env` 或直接在编辑器打开），再回来跑示例。
 
 ### 方式 A：本地 Ollama（推荐新手，免费、零 key）
 
@@ -26,7 +42,7 @@
    ollama pull qwen2.5:7b        # 对话模型（Phase 1–9 通用）
    ollama pull nomic-embed-text  # 嵌入模型（Phase 2 RAG 章节需要）
    ```
-4. 在 `.env` 中设置：
+4. 在 `.env` 中确认：
    ```ini
    LLM_PROVIDER=ollama
    ```
@@ -37,7 +53,7 @@
 
 ### 方式 B：云端 API（OpenAI / DeepSeek）
 
-在 `.env` 中设置（二选一）：
+编辑 `.env`，二选一：
 
 ```ini
 # DeepSeek（便宜、国内可达，推荐）
@@ -49,25 +65,7 @@ DEEPSEEK_API_KEY=你的key
 # OPENAI_API_KEY=你的key
 ```
 
-> 用云端 API 时无需安装/启动 Ollama，示例会直接走官方或兼容接口。
-
-## 快速开始（推荐一键）
-
-本仓库提供**编辑器无关**的 `Makefile`，在 PyCharm / WebStorm 终端、VS Code 或 CI 中都能直接运行：
-
-```bash
-make setup        # 创建 .venv 并安装 Python + Node 依赖，复制 .env
-make docs         # 构建双语文档站 -> docs/.vitepress/dist
-make docs-dev     # 本地实时预览 http://localhost:5173
-make run p=1      # 运行 Phase 1 示例（p=2..9 同理）
-make lint         # 对所有示例做语法校验
-```
-
-💡 **环境就绪后，先看文档再动手（推荐）**：上面 `make setup` 装好 Node 依赖后，运行 `make docs-dev`（或 `npm run docs:dev`）即可在浏览器打开 **http://localhost:5173** 阅读教程——文档站对每个 Phase 的原理、代码、验收清单都有详细说明。建议按 Phase 顺序读完对应章节，再回来 `make run p=N` 跑示例，效果更佳。
-
-> **IDE 用法（PyCharm + WebStorm）**：Python 代码用 PyCharm 打开项目根目录即可识别 `examples/`；文档站用 WebStorm 打开 `docs/`，或在 PyCharm 终端跑 `make docs-dev`。两者都自带 Terminal，可直接执行上面的 `make` 命令。
->
-> 开发环境要求：Python 3.13+、Node 22+。
+> 用云端 API 时无需安装/启动 Ollama，示例会直接走官方或兼容接口。配置好 `.env` 后即可 `make run p=N`。
 
 下面章节为等价的手动步骤。
 
