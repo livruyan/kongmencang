@@ -1,3 +1,5 @@
+![LangChain & LangGraph Course Cover](social-preview.png)
+
 # LangChain & LangGraph: A Systematic Course
 
 > Understand Agent orchestration from first principles: **State Graph + Nodes + Conditional Edges**.

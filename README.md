@@ -1,3 +1,5 @@
+![LangChain & LangGraph 系统化学习封面](social-preview.png)
+
 # LangChain & LangGraph 系统化学习
 
 > 从底层范式理解 Agent 编排：**状态图 + 节点 + 条件边**。
