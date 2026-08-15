@@ -1,8 +1,8 @@
-![LangChain & LangGraph 系统化学习封面](social-preview.png)
-
 # LangChain & LangGraph 系统化学习
 
 > 从底层范式理解 Agent 编排：**状态图 + 节点 + 条件边**。
+
+![LangChain & LangGraph 系统化学习封面](social-preview.png)
 
 本项目是一个面向「会基础编程、但没碰过 LLM/Agent」开发者的开源学习项目，目标是帮你从根本上理解 Agent 的工作原理，为构建复杂应用打基础。
 

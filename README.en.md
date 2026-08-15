@@ -1,8 +1,8 @@
-![LangChain & LangGraph Course Cover](social-preview.png)
-
 # LangChain & LangGraph: A Systematic Course
 
 > Understand Agent orchestration from first principles: **State Graph + Nodes + Conditional Edges**.
+
+![LangChain & LangGraph Course Cover](social-preview.png)
 
 This is an open-source learning project for developers who can program but have not yet worked with LLMs / Agents. The goal is to help you truly understand how Agents work, so you can build complex applications on a solid foundation.
 
