@@ -19,9 +19,9 @@
 
 设计取舍 / Design notes:
   - 默认后端为 SQLite（Python 标准库，零额外依赖，可持久化到磁盘）。
-  - 检索默认走关键词（FTS5，不可用时退化为 LIKE），不强制依赖 embedding，
-    因此离线 / 无 API key 也能跑通，便于把「记忆层」与「向量检索」解耦演示。
-  - 若提供了 embedding，可用向量召回做语义检索（retrieve_semantic 预留接口）。
+  - 检索采用**字符级 n-gram 重合**的朴素词法召回（对中文鲁棒、零依赖、无需
+    embedding），因此离线 / 无 API key 也能跑通，便于把「记忆层」与「向量检索」
+    解耦演示。若接入 embedding，可替换为向量召回（retrieve_semantic 接口不变）。
 
 典型用法见 examples/p10/hello_chain.py。
 """
@@ -93,16 +93,6 @@ class MemoryStore:
             )
             """
         )
-        # 尝试启用 FTS5（多数 Python 自带）；失败则回退到 LIKE 检索。
-        self._has_fts = False
-        try:
-            cur.execute(
-                "CREATE VIRTUAL TABLE IF NOT EXISTS semantic_fts "
-                "USING fts5(fact, content='semantic', content_rowid='id')"
-            )
-            self._has_fts = True
-        except sqlite3.OperationalError:
-            self._has_fts = False
         self._conn.commit()
 
     # -- episodic --------------------------------------------------------
@@ -138,13 +128,8 @@ class MemoryStore:
             "VALUES (?, ?, ?, ?)",
             (fact, source_ref, session_id, time.time()),
         )
-        sid = cur.lastrowid
-        if self._has_fts:
-            cur.execute(
-                "INSERT INTO semantic_fts (rowid, fact) VALUES (?, ?)", (sid, fact)
-            )
         self._conn.commit()
-        return sid
+        return cur.lastrowid
 
     def get_semantic(self, semantic_id: int) -> Optional[SemanticMemory]:
         row = self._conn.execute(
@@ -152,21 +137,46 @@ class MemoryStore:
         ).fetchone()
         return SemanticMemory(**row) if row else None
 
-    def retrieve_semantic(self, query: str, top_k: int = 3) -> list[SemanticMemory]:
-        """按关键词召回语义记忆，并附带来源引用。"""
-        if self._has_fts:
-            rows = self._conn.execute(
-                "SELECT s.* FROM semantic_fts f "
-                "JOIN semantic s ON s.id = f.rowid "
-                "WHERE semantic_fts MATCH ? ORDER BY rank LIMIT ?",
-                (query, top_k),
-            ).fetchall()
-        else:
-            like = f"%{query}%"
-            rows = self._conn.execute(
-                "SELECT * FROM semantic WHERE fact LIKE ? LIMIT ?", (like, top_k)
-            ).fetchall()
+    def list_semantic(self) -> list[SemanticMemory]:
+        """返回全部语义记忆（用于演示「溯源全貌」）。"""
+        rows = self._conn.execute(
+            "SELECT * FROM semantic ORDER BY id"
+        ).fetchall()
         return [SemanticMemory(**r) for r in rows]
+
+    @staticmethod
+    def _char_ngrams(text: str, n: int = 2) -> set[str]:
+        """把文本转成字符级 n-gram 集合（去标点、统一小写）。
+
+        对中文按字切、英文按词根也能覆盖，是零依赖的跨语言相似度基线。
+        """
+        cleaned = "".join(ch for ch in text if ch.isalnum())
+        cleaned = cleaned.lower()
+        if len(cleaned) == 0:
+            return set()
+        if len(cleaned) < n:
+            return {cleaned}
+        return {cleaned[i : i + n] for i in range(len(cleaned) - n + 1)}
+
+    def _overlap_score(self, a: str, b: str) -> int:
+        """字符级 n-gram 重合度，作为朴素词法相似度分数。"""
+        return len(self._char_ngrams(a) & self._char_ngrams(b))
+
+    def retrieve_semantic(self, query: str, top_k: int = 3) -> list[SemanticMemory]:
+        """按词法重合度召回语义记忆，并附带来源引用。
+
+        采用字符级 n-gram 重合（对中文鲁棒、无需 embedding）。返回与查询
+        有重合的语义记忆，按重合度降序；无任何重合则返回空列表。
+        """
+        rows = self._conn.execute("SELECT * FROM semantic").fetchall()
+        scored = []
+        for r in rows:
+            score = self._overlap_score(query, r["fact"])
+            # 阈值过滤：要求至少 2 个 n-gram 重合，避免 "gr" 这类偶然单字重合误召回
+            if score >= 2:
+                scored.append((score, r))
+        scored.sort(key=lambda x: x[0], reverse=True)
+        return [SemanticMemory(**r) for _, r in scored[:top_k]]
 
     # -- 防幻觉：把记忆拼成带引用的上下文 --------------------------------
     def build_citation_context(self, query: str, top_k: int = 3) -> str:

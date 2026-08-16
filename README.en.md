@@ -139,6 +139,18 @@ The sections below are the manual equivalent steps.
    python -m examples.p1.hello_chain
    ```
 
+### One-click verification (Phase 10–13)
+
+After configuring the LLM, run `./verify.sh` to automatically execute Phase 10–13 and check each one against its key markers (it doesn't compare exact answers, since LLM output is non-deterministic):
+
+```bash
+./verify.sh          # verify Phase 10 -> 13 in order
+./verify.sh 11       # verify a single Phase
+./verify.sh 10 13    # verify only the specified Phases
+```
+
+> Each Phase makes a real LLM call, so it takes a while (default per-Phase timeout is 360s). Requires a usable `LLM_PROVIDER` in `.env`.
+
 ## Preview the Docs Locally
 
 ```bash

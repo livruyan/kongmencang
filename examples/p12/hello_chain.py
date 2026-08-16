@@ -21,6 +21,7 @@ MCP 是 agent 接工具，A2A 是 agent 接 agent）。
     # 或 make run p=12
 """
 import asyncio
+import warnings
 from typing import Annotated, Sequence, TypedDict
 
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
@@ -29,6 +30,9 @@ from langgraph.graph.message import add_messages
 from langgraph.prebuilt import create_react_agent
 
 from examples.common.llm import get_chat_model
+
+# langgraph>=1 把 create_react_agent 标为 deprecated（功能仍正常），抑制该提示让演示输出干净
+warnings.filterwarnings("ignore", message=".*create_react_agent has been moved.*")
 
 
 # ---- 共享状态：messages 用 add_messages 累加，next 记录主管的路由决策 ----------
@@ -65,16 +69,36 @@ async def supervisor(state: AgentState) -> dict:
         [HumanMessage(content=ROUTING_INSTRUCTION)] + list(state["messages"])
     )
     text = decision.content.strip() if isinstance(decision.content, str) else "FINISH"
-    # 容错：只取最后出现的合法 token，避免模型多嘴
-    for token in ("FINISH", "writer", "researcher"):
-        if token in text:
-            text = token
+    # 解析 LLM 决策：只取最后出现的合法 token，避免模型多嘴
+    token = None
+    for t in ("FINISH", "writer", "researcher"):
+        if t in text:
+            token = t
             break
-    else:
-        text = "FINISH"
-    label = {"researcher": "调研员", "writer": "写作者", "FINISH": "结束"}.get(text, "结束")
+
+    # 确定性兜底，保证演示出「调研员 → 写作者 → 结束」完整链路：
+    # 研究员已产出但写作者还没 → 强制走写作者；写作者已产出 → 结束。
+    # （生产环境可让主管完全自由路由；此处约束是为了稳定展示双 worker 协作。）
+    has_research = any(
+        "（主管决定：调研员）" in m.content
+        for m in state["messages"]
+        if isinstance(m, AIMessage)
+    )
+    has_writer = any(
+        "（主管决定：写作者）" in m.content
+        for m in state["messages"]
+        if isinstance(m, AIMessage)
+    )
+    if has_research and not has_writer:
+        token = "writer"
+    elif has_writer:
+        token = "FINISH"
+    if token is None:
+        token = "FINISH"
+
+    label = {"researcher": "调研员", "writer": "写作者", "FINISH": "结束"}.get(token, "结束")
     print(f"\n[supervisor] 路由决策 → {label}")
-    return {"messages": [AIMessage(content=f"（主管决定：{label}）")], "next": text}
+    return {"messages": [AIMessage(content=f"（主管决定：{label}）")], "next": token}
 
 
 async def call_researcher(state: AgentState) -> dict:

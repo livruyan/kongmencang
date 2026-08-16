@@ -65,7 +65,7 @@ def main() -> None:
     print("A:", answer_guarded(ms, q2))
 
     print("\n===== 记忆检索明细（验证溯源）=====")
-    for hit in ms.retrieve_semantic("部署"):
+    for hit in ms.list_semantic():
         print(f"  semantic#{hit.id} fact='{hit.fact}' source={hit.source_ref}")
         ep = ms.get_episode(int(hit.source_ref.split(":")[-1]))
         if ep:

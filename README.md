@@ -139,6 +139,18 @@ QWEN_API_KEY=你的key
    python -m examples.p1.hello_chain
    ```
 
+### 一键验证（Phase 10–13 进阶实战）
+
+仓库根目录的 `verify.sh` 会依次运行 Phase 10–13，并对照各示例的关键输出标记判断跑通与否（不依赖具体回答，因为 LLM 输出非确定）。需先 `make setup` 且 `.env` 已配好可用 provider。
+
+```bash
+./verify.sh          # 依次验证 Phase 10 -> 13
+./verify.sh 11       # 只验证单个 Phase
+./verify.sh 10 13    # 只验证指定的几个 Phase
+```
+
+> 每个 Phase 会真正调用 LLM，耗时取决于模型响应速度（默认超时 360s，可在脚本内调整）。判分依据是打印出的关键标记，而非回答内容本身。
+
 ## 本地预览文档站
 
 ```bash

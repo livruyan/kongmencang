@@ -38,7 +38,10 @@ async def main_async() -> None:
     print(f"已从 MCP 服务器加载 {len(tools)} 个工具：{[t.name for t in tools]}")
 
     agent = create_react_agent(get_chat_model(), tools)  # 底层即一张状态图：Node=模型调用，边=工具循环
-    result = agent.invoke({"messages": [("user", "北京现在多少度？另外帮我搜一下 LangGraph 是什么。")]})
+    # MCP 工具是 StructuredTool，只支持异步调用，因此用 ainvoke
+    result = await agent.ainvoke(
+        {"messages": [("user", "北京现在多少度？另外帮我搜一下 LangGraph 是什么。")]}
+    )
 
     print("\n===== 最终答案 =====")
     print(result["messages"][-1].content)
