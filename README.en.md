@@ -4,7 +4,9 @@
 
 ![LangChain & LangGraph Course Cover](social-preview.png)
 
-This is an open-source learning project for developers who can program but have not yet worked with LLMs / Agents. The goal is to help you truly understand how Agents work, so you can build complex applications on a solid foundation.
+This is a **hands-on, zero-to-production multi-agent systems course**: using LangChain / LangGraph as the vehicle, it takes you from first principles of Agent orchestration (State Graph + Nodes + Conditional Edges) all the way to a full set of production-grade capabilities — persistent memory (checkpoint), human-in-the-loop (HITL), a traceable independent memory layer, MCP tool interfaces, multi-agent collaboration (A2A), service deployment, and observability. It is both a step-by-step learning path and a demonstrable **production-grade multi-agent system reference implementation**.
+
+> **Positioning**: This repo grew out of the official LangChain tutorials, re-engineered and extended — I used it to deeply understand LangGraph's state machine, checkpoint, and HITL internals, then filled the gaps the original tutorials miss (independent memory layer, MCP communication substrate, deployment & observability). If asked in an interview whether it was independently designed, be honest about this; focus on the internals you actually mastered. Its relationship with a self-built kernel project (e.g. "Lingxi") is complementary: one proves you can ship fast with frameworks, the other proves you can build the internals.
 
 Our core thesis: most mainstream Agent frameworks (CrewAI, AutoGen, etc.) can be mapped onto LangGraph's model of **StateGraph + Node + Conditional Edge**. Master LangChain and LangGraph, and you master the underlying paradigm of Agent orchestration.
 
@@ -21,7 +23,7 @@ This repo ships an **editor-agnostic** `Makefile` that works in the PyCharm / We
 make setup        # create .venv, install Python + Node deps, copy .env
 make docs         # build the bilingual docs site -> docs/.vitepress/dist
 make docs-dev     # live preview at http://localhost:5173
-make run p=1      # run Phase 1 example (p=2..9 likewise; configure .env first — see "Configure the LLM" below)
+make run p=1      # run Phase 1 example (p=2..13 likewise; configure .env first — see "Configure the LLM" below)
 make lint         # py_compile all examples
 ```
 
@@ -40,7 +42,7 @@ make lint         # py_compile all examples
 - **Configure the LLM (.env)**: the `.env` copied in the previous step defaults to local Ollama. You must change it to Ollama / DeepSeek / OpenAI based on your situation. **This is a required config before running examples.**
 
 **2. The actual learning content (core)**
-- **Learning Path (9 Phases)**: walks through Agent orchestration (State Graph + Node + Conditional Edge) progressively from P1 to P9. Each Phase comes with principle explanations, example code, and an acceptance checklist. **This is the part you actually "learn".**
+- **Learning Path (13 Phases)**: walks through Agent orchestration (State Graph + Node + Conditional Edge) progressively from P1 to P13. P1–P9 are the fundamentals; P10/P11/P12/P13 are advanced hands-on chapters (independent memory layer / MCP tool interface / multi-agent collaboration A2A / A2A standard protocol). Each Phase comes with principle explanations, example code, and an acceptance checklist. **This is the part you actually "learn".**
 
 **3. Optional / maintainer-only (learners can skip)**
 - **Running the Examples**, **Preview the Docs Locally**: these are the **manual equivalents** of `make run p=N` and `make docs-dev` (raw `pip` / `python` / `npm` commands). If you use `make`, you don't need them.
@@ -53,10 +55,10 @@ make setup        # 1. set up the environment (one-time)
 # then edit .env to choose your LLM (see "Configure the LLM")
 make docs-dev     # 2. open http://localhost:5173 and read Phase 1
 make run p=1      # 3. run the Phase 1 example to verify understanding
-# 4. repeat 2 -> 3 for P1 -> P9 until the whole project is done
+# 4. repeat 2 -> 3 for P1 -> P13 until the whole project is done (P10/P11/P12/P13 are advanced — go deeper as needed)
 ```
 
-> In one sentence: **Quick Start = set up the tools; the 9 Phases = the course you actually study; Running Examples / Preview = how to use the tools; Deploy = publish the result.** Finishing Quick Start is only the doorway.
+> In one sentence: **Quick Start = set up the tools; the 13 Phases = the course you actually study; Running Examples / Preview = how to use the tools; Deploy = publish the result.** Finishing Quick Start is only the doorway.
 
 ## Configure the LLM (.env)
 
@@ -80,7 +82,7 @@ make run p=1      # 3. run the Phase 1 example to verify understanding
    curl http://localhost:11434     # returns "Ollama is running" when OK
    ```
 
-### Option B: Cloud API (OpenAI / DeepSeek)
+### Option B: Cloud API (OpenAI / DeepSeek / Qwen)
 
 Edit `.env`, pick one:
 
@@ -88,6 +90,10 @@ Edit `.env`, pick one:
 # DeepSeek (cheap, reachable from China, recommended)
 LLM_PROVIDER=deepseek
 DEEPSEEK_API_KEY=your-key
+
+# Qwen (Alibaba DashScope — fits "self-reliant / domestic models")
+LLM_PROVIDER=qwen
+QWEN_API_KEY=your-key
 
 # or OpenAI
 # LLM_PROVIDER=openai
@@ -98,7 +104,7 @@ DEEPSEEK_API_KEY=your-key
 
 The sections below are the manual equivalent steps.
 
-## Learning Path (9 Phases)
+## Learning Path (13 Phases)
 
 | Phase | Topic |
 |-------|-------|
@@ -111,6 +117,10 @@ The sections below are the manual equivalent steps.
 | 7 | State, Memory & Human-in-the-loop |
 | 8 | Production Deployment |
 | 9 | Capstone Comprehensive Project & Full Review |
+| 10 | Independent Memory Layer: episodic + semantic + traceability (anti-hallucination) |
+| 11 | MCP Tool Interface: let Agents call standard-protocol tools |
+| 12 | Multi-Agent Collaboration (A2A): native supervisor + worker agents |
+| 13 | A2A Standard Protocol: Agent Card + JSON-RPC cross-process interop |
 
 ## Running the Examples
 
@@ -122,7 +132,7 @@ The sections below are the manual equivalent steps.
 2. Copy and configure the environment variables:
    ```bash
    cp .env.example .env
-   # edit .env and choose LLM_PROVIDER (openai / deepseek / ollama)
+   # edit .env and choose LLM_PROVIDER (openai / deepseek / qwen / ollama)
    ```
 3. Run an example (Phase 1 as a sample):
    ```bash
@@ -157,6 +167,7 @@ All examples switch models through one unified **LLM Provider abstraction layer*
 
 - `openai`: official OpenAI (default), requires `OPENAI_API_KEY`.
 - `deepseek`: DeepSeek, OpenAI-compatible endpoint, requires `DEEPSEEK_API_KEY`.
+- `qwen`: Qwen (Alibaba DashScope, OpenAI-compatible endpoint), requires `QWEN_API_KEY` — fits "self-reliant / domestic models".
 - `ollama`: local Ollama, **key-free**, recommended for a zero-friction experience in the early chapters.
 
 See `.env.example` and the docs for each Phase for details.

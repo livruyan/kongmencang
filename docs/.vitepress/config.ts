@@ -69,6 +69,37 @@ const zhSidebar = [
       { text: '扩展示例 · 简易评测', link: '/p9-capstone#extra-p9' },
     ],
   },
+  {
+    text: 'Phase 10 · 记忆独立层',
+    items: [
+      { text: 'Phase 10 · 可溯源记忆与防幻觉', link: '/p10-memory-layer' },
+    ],
+  },
+  {
+    text: 'Phase 11 · MCP 工具接口',
+    items: [
+      { text: 'Phase 11 · 让智能体调用标准协议工具', link: '/p11-mcp' },
+    ],
+  },
+  {
+    text: 'Phase 12 · 多智能体协作 (A2A)',
+    items: [
+      { text: 'Phase 12 · 智能体调用智能体', link: '/p12-a2a' },
+    ],
+  },
+  {
+    text: 'Phase 13 · A2A 标准协议',
+    items: [
+      { text: 'Phase 13 · Google A2A 标准协议', link: '/p13-a2a-protocol' },
+    ],
+  },
+  {
+    text: '附录 / Appendix',
+    items: [
+      { text: '框架 vs 自研内核（博客）', link: '/blog-framework-vs-inhouse' },
+      { text: 'LangGraph 状态机白板稿', link: '/whiteboard-langgraph' },
+    ],
+  },
 ]
 
 // 英文侧边栏 / English sidebar
@@ -140,6 +171,37 @@ const enSidebar = [
       { text: 'Extra · Minimal eval', link: '/en/p9-capstone#extra-p9' },
     ],
   },
+  {
+    text: 'Phase 10 · Memory Layer',
+    items: [
+      { text: 'Phase 10 · Traceable Memory & Anti-hallucination', link: '/en/p10-memory-layer' },
+    ],
+  },
+  {
+    text: 'Phase 11 · MCP Tools',
+    items: [
+      { text: 'Phase 11 · Standard-protocol Tools', link: '/en/p11-mcp' },
+    ],
+  },
+  {
+    text: 'Phase 12 · Multi-Agent (A2A)',
+    items: [
+      { text: 'Phase 12 · Agent-to-Agent', link: '/en/p12-a2a' },
+    ],
+  },
+  {
+    text: 'Phase 13 · A2A Standard Protocol',
+    items: [
+      { text: 'Phase 13 · Google A2A Protocol', link: '/en/p13-a2a-protocol' },
+    ],
+  },
+  {
+    text: 'Appendix',
+    items: [
+      { text: 'Frameworks vs Kernel (Blog)', link: '/en/blog-framework-vs-inhouse' },
+      { text: 'LangGraph Whiteboard', link: '/en/whiteboard-langgraph' },
+    ],
+  },
 ]
 
 export default defineConfig({
@@ -163,6 +225,10 @@ export default defineConfig({
           { text: 'Phase 7', link: '/p7-hitl-persistence' },
           { text: 'Phase 8', link: '/p8-deployment' },
           { text: 'Phase 9', link: '/p9-capstone' },
+          { text: 'Phase 10', link: '/p10-memory-layer' },
+          { text: 'Phase 11', link: '/p11-mcp' },
+          { text: 'Phase 12', link: '/p12-a2a' },
+          { text: 'Phase 13', link: '/p13-a2a-protocol' },
         ],
         sidebar: zhSidebar,
       },
@@ -183,6 +249,10 @@ export default defineConfig({
           { text: 'Phase 7', link: '/en/p7-hitl-persistence' },
           { text: 'Phase 8', link: '/en/p8-deployment' },
           { text: 'Phase 9', link: '/en/p9-capstone' },
+          { text: 'Phase 10', link: '/en/p10-memory-layer' },
+          { text: 'Phase 11', link: '/en/p11-mcp' },
+          { text: 'Phase 12', link: '/en/p12-a2a' },
+          { text: 'Phase 13', link: '/en/p13-a2a-protocol' },
         ],
         sidebar: enSidebar,
       },

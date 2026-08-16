@@ -24,7 +24,7 @@ help:
 
 setup: install-py install-docs
 	cp -n .env.example .env || true
-	@echo "Done. Edit .env to choose LLM_PROVIDER (openai / deepseek / ollama)."
+	@echo "Done. Edit .env to choose LLM_PROVIDER (openai / deepseek / qwen / ollama)."
 
 install-py:
 	$(PYTHON) -m venv $(VENV)

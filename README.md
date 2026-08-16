@@ -4,7 +4,9 @@
 
 ![LangChain & LangGraph 系统化学习封面](social-preview.png)
 
-本项目是一个面向「会基础编程、但没碰过 LLM/Agent」开发者的开源学习项目，目标是帮你从根本上理解 Agent 的工作原理，为构建复杂应用打基础。
+本项目是一套**从零到生产的多智能体系统实战教程**：以 LangChain / LangGraph 为载体，带你吃透 Agent 编排的底层范式（状态图 + 节点 + 条件边），并落地一整套生产级工程能力——持久化记忆（checkpoint）、人工介入（HITL）、可溯源的记忆独立层、MCP 工具接口、多智能体协作（A2A）、服务化部署与可观测性。它既是一条循序渐进的学习路径，也是一份可直接演示的**生产级多智能体系统样板**。
+
+> **项目定位 / Positioning**：本仓库脱胎于 LangChain 官方教程的工程化封装与扩展——我据此吃透了 LangGraph 状态机、checkpoint、HITL 的底层原理，并补齐了原教程缺失的生产要素（记忆独立层、MCP 通信底座、部署与可观测性）。面试中若被问「是否独立设计」，请诚实说明这一点；重点应放在你真正吃透并可深挖的原理上。与自研内核项目（如「灵犀」）的关系是互补：一个证明「会用框架快速落地」，一个证明「能自研底层」。
 
 我们认为：市面主流 Agent 框架（CrewAI、AutoGen 等）的底层逻辑，都可以映射到 LangGraph 的 **状态图（StateGraph）+ 节点（Node）+ 条件边（Conditional Edge）** 模型。掌握 LangChain 与 LangGraph，就等于掌握了 Agent 编排的底层范式。
 
@@ -21,7 +23,7 @@
 make setup        # 创建 .venv 并安装 Python + Node 依赖，复制 .env
 make docs         # 构建双语文档站 -> docs/.vitepress/dist
 make docs-dev     # 本地实时预览 http://localhost:5173
-make run p=1      # 运行 Phase 1 示例（p=2..9 同理，需先配置 .env，见下方「配置大模型」）
+make run p=1      # 运行 Phase 1 示例（p=2..13 同理，需先配置 .env，见下方「配置大模型」）
 make lint         # 对所有示例做语法校验
 ```
 
@@ -40,7 +42,7 @@ make lint         # 对所有示例做语法校验
 - 「配置大模型（.env）」：上一步复制出的 `.env` 默认指向本地 Ollama，需按实际情况改成 Ollama / DeepSeek / OpenAI。**跑示例前的必做配置。**
 
 **2. 真正的学习内容（核心）**
-- 「学习路线（9 个 Phase）」：从 P1 到 P9 循序渐进讲 Agent 编排（状态图 + 节点 + 条件边），每个 Phase 配原理讲解、示例代码与验收清单。**这才是你要"学"的部分。**
+- 「学习路线（13 个 Phase）」：P1–P9 循序渐进讲 Agent 编排基础（状态图 + 节点 + 条件边），P10/P11/P12/P13 为进阶实战（记忆独立层 / MCP 工具接口 / 多智能体协作 A2A / A2A 标准协议）；每个 Phase 配原理讲解、示例代码与验收清单。**这才是你要"学"的部分。**
 
 **3. 可选 / 维护向（普通学习者可跳过）**
 - 「运行示例」「本地预览文档站」：分别是 `make run p=N` 和 `make docs-dev` 的**手动等价写法**（裸 `pip`/`python`/`npm` 命令）。你用 `make` 就不用看它们。
@@ -53,10 +55,10 @@ make setup        # 1. 装好环境（一次性）
 # 然后编辑 .env 选好大模型（见「配置大模型」）
 make docs-dev     # 2. 打开 http://localhost:5173 读 Phase 1 讲解
 make run p=1      # 3. 跑 Phase 1 示例验证理解
-# 4. 按 P1 -> P9 重复 2 -> 3，直到学完整个项目
+# 4. 按 P1 -> P13 重复 2 -> 3，直到学完整个项目（P10/P11/P12/P13 为进阶，可按需深入）
 ```
 
-> 一句话：**快速开始 = 把工具装好；9 个 Phase = 真正要学的课程；运行示例 / 本地预览 = 怎么用工具；部署 = 把成果公开。** 跑完快速开始只是刚进门。
+> 一句话：**快速开始 = 把工具装好；13 个 Phase = 真正要学的课程（P1–P9 基础，P10/P11/P12/P13 进阶实战）；运行示例 / 本地预览 = 怎么用工具；部署 = 把成果公开。** 跑完快速开始只是刚进门。
 
 ## 配置大模型（.env）
 
@@ -80,14 +82,18 @@ make run p=1      # 3. 跑 Phase 1 示例验证理解
    curl http://localhost:11434     # 返回 "Ollama is running" 即正常
    ```
 
-### 方式 B：云端 API（OpenAI / DeepSeek）
+### 方式 B：云端 API（OpenAI / DeepSeek / 通义千问）
 
-编辑 `.env`，二选一：
+编辑 `.env`，三选一：
 
 ```ini
 # DeepSeek（便宜、国内可达，推荐）
 LLM_PROVIDER=deepseek
 DEEPSEEK_API_KEY=你的key
+
+# 通义千问 Qwen（阿里 DashScope，贴合「自主可控 / 国产模型」）
+LLM_PROVIDER=qwen
+QWEN_API_KEY=你的key
 
 # 或 OpenAI
 # LLM_PROVIDER=openai
@@ -98,7 +104,7 @@ DEEPSEEK_API_KEY=你的key
 
 下面章节为等价的手动步骤。
 
-## 学习路线（9 个 Phase）
+## 学习路线（13 个 Phase）
 
 | Phase | 主题 |
 |-------|------|
@@ -111,6 +117,10 @@ DEEPSEEK_API_KEY=你的key
 | 7 | 状态、记忆与 Human-in-the-loop |
 | 8 | 生产部署实战 |
 | 9 | Capstone 综合实战与全景复盘 |
+| 10 | 记忆独立层：episodic + semantic + 溯源（防幻觉） |
+| 11 | MCP 工具接口：让智能体调用标准协议工具 |
+| 12 | 多智能体协作（A2A）：supervisor + worker 原生多智能体 |
+| 13 | A2A 标准协议：Agent Card + JSON-RPC 跨进程互联 |
 
 ## 运行示例
 
@@ -122,7 +132,7 @@ DEEPSEEK_API_KEY=你的key
 2. 复制并配置环境变量：
    ```bash
    cp .env.example .env
-   # 编辑 .env，选择 LLM_PROVIDER（openai / deepseek / ollama）
+   # 编辑 .env，选择 LLM_PROVIDER（openai / deepseek / qwen / ollama）
    ```
 3. 运行示例（以 Phase 1 为例）：
    ```bash
@@ -157,6 +167,7 @@ npm run docs:build    # 构建静态站
 
 - `openai`：官方 OpenAI（默认），需 `OPENAI_API_KEY`。
 - `deepseek`：DeepSeek，OpenAI 兼容接口，需 `DEEPSEEK_API_KEY`。
+- `qwen`：通义千问（阿里 DashScope，OpenAI 兼容接口），需 `QWEN_API_KEY`，贴合「自主可控 / 国产模型」。
 - `ollama`：本地 Ollama，**免 key**，前几章推荐用于零门槛体验。
 
 详见 `.env.example` 与各 Phase 文档。

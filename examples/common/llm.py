@@ -7,6 +7,7 @@ models across every example.
 支持的 provider / Supported providers:
   - openai   : 官方 OpenAI（默认 / default）
   - deepseek : DeepSeek（OpenAI 兼容接口 / OpenAI-compatible）
+  - qwen     : 通义千问（阿里 DashScope，OpenAI 兼容接口 / OpenAI-compatible）
   - ollama   : 本地 Ollama（免 key / key-free，前几章推荐 / recommended early on）
 """
 from typing import Optional
@@ -46,6 +47,24 @@ def get_chat_model(temperature: float = 0.0, model: Optional[str] = None):
             temperature=temperature,
             api_key=api_key,
             base_url=base_url,  # None 时走官方地址 / official endpoint when None
+        )
+
+    if PROVIDER == "qwen":
+        from langchain_openai import ChatOpenAI
+
+        api_key = os.getenv("QWEN_API_KEY")
+        base_url = os.getenv("QWEN_BASE_URL")
+        model = model or os.getenv("QWEN_MODEL", "qwen-plus")
+        if not api_key:
+            raise RuntimeError(
+                "未检测到通义千问 API key / no Qwen key found. 请在 .env 中设置 "
+                "QWEN_API_KEY（即 DashScope API Key），或将 LLM_PROVIDER 设为 ollama。"
+            )
+        return ChatOpenAI(
+            model=model,
+            temperature=temperature,
+            api_key=api_key,
+            base_url=base_url,  # DashScope 兼容地址 / DashScope-compatible endpoint when set
         )
 
     if PROVIDER == "openai":
@@ -94,6 +113,23 @@ def get_embeddings(model: Optional[str] = None):
         return OpenAIEmbeddings(
             model=model or os.getenv("OPENAI_EMBED_MODEL", "text-embedding-3-small"),
             api_key=api_key,
+        )
+
+    if PROVIDER == "qwen":
+        # 通义千问 embedding 走 DashScope 兼容接口（text-embedding-v3 等）。
+        from langchain_openai import OpenAIEmbeddings
+
+        api_key = os.getenv("QWEN_API_KEY")
+        base_url = os.getenv("QWEN_BASE_URL")
+        if not api_key:
+            raise RuntimeError(
+                "未检测到通义千问 API key / no Qwen key found. 请在 .env 中设置 "
+                "QWEN_API_KEY 用于 embedding，或将 LLM_PROVIDER 设为 ollama。"
+            )
+        return OpenAIEmbeddings(
+            model=model or os.getenv("QWEN_EMBED_MODEL", "text-embedding-v3"),
+            api_key=api_key,
+            base_url=base_url,
         )
 
     if PROVIDER == "openai":

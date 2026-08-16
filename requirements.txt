@@ -18,6 +18,10 @@ uvicorn>=0.29.0
 # 环境变量加载
 python-dotenv>=1.0.0
 
+# MCP 工具接口（Phase 11，让智能体调用标准协议工具）
+mcp>=1.2.0
+langchain-mcp-adapters>=0.0.9
+
 # 可观测性（Phase 8，项目决策：Langfuse 为主 / LangSmith 可选）
 langfuse>=2.0.0
 langsmith>=0.1.0
