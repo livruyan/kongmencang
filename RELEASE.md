@@ -1,4 +1,4 @@
-# LangChain & LangGraph 系统化实战教程 v1.0.1
+# LangChain & LangGraph 系统化实战教程 v1.0.2
 
 一套从零讲透「用 LangChain / LangGraph 造 Agent，并理解各框架共通的图编排本质」的双语实战教程。
 
@@ -60,6 +60,8 @@ make setup        # 先装好环境并配好 .env
 
 `verify.sh` 会对照各示例的关键输出标记判断跑通与否（LLM 输出非确定，故按标记而非具体回答判分）。
 
+> **v1.0.2 修复**：原脚本用 `make run` 在后台子 shell 启动示例，上层 shell 退出时向进程组发 `SIGHUP` 会导致 `make` 挂掉、Phase 11（需拉起 MCP server 子进程）偶发失败。已改为直接用 `nohup ./.venv/bin/python -m examples.pXX.hello_chain` 调用，复跑确认 Phase 10–13 **通过 4 / 未通过 0**。
+
 ## 文档站 / Docs
 
 - 中文：https://shadowquill.github.io/langchain-langgraph-tutorial/
@@ -71,4 +73,4 @@ make setup        # 先装好环境并配好 .env
 
 ---
 
-> 完整改动见提交历史：`97991c1`（落地 P10–P13）与 `5bde29a`（修复 P10–P12 运行 bug 并新增 `verify.sh`）。
+> 完整改动见提交历史：`97991c1`（落地 P10–P13）、`5bde29a`（修复 P10–P12 运行 bug 并新增 `verify.sh`）、`246d953`（修复 `verify.sh` 后台 SIGHUP 致 Phase 11 失败）。

@@ -2,6 +2,24 @@
 
 本项目采用语义化版本（SemVer）。所有重要变更记录于此。
 
+## [v1.0.2] — 2026-08-17
+
+> 修复 `verify.sh` 在后台运行时的稳定性问题，并补齐全量发布文档。
+
+### 修复 / Fixed
+- **修复 `verify.sh` 后台启动时 Phase 11 偶发失败**：原脚本用 `make run` 在后台子 shell 启动示例，上层 shell 退出时向进程组发 `SIGHUP`，`make` 会直接挂掉（`Hangup: 1`），而会拉起子进程（MCP server）的 Phase 11 最先中招。改为直接用 `nohup ./.venv/bin/python -m examples.pXX.hello_chain` 调用，绕过 `make`，`nohup` 让进程组忽略 `SIGHUP`。复跑确认 Phase 10–13 **通过 4 / 未通过 0**。
+
+### 文档 / Docs
+- 新增 `CHANGELOG.md` 的 v1.0.2 记录（即本段）。
+- 仓库内 `RELEASE.md` 标题对齐为 v1.0.2 并补充修复说明。
+
+### 标签说明 / Tags
+- `v1.0.2`：指向当前 `main` 头 `246d953`，为最新完整发布（**Latest**）。
+- `v1.0.1`：上一版完整发布（Phase 10–13 首次补齐）。
+- `v1.0.0`：早期 P1–P9 基线快照，作为历史保留。
+
+---
+
 ## [v1.0.1] — 2026-08-17
 
 > 在 v1.0.0（P1–P9 基线）之上补齐生产级进阶实战，形成完整的 13 Phase 课程。
@@ -24,10 +42,6 @@
 - 双语文档站新增 Phase 10–13 四篇讲解（`docs/` 中英文）。
 - `docs/.vitepress/config.ts` 中英文导航 / 侧边栏补齐 Phase 10–13。
 - 新增 `CHANGELOG.md`。
-
-### 标签说明 / Tags
-- `v1.0.0`：指向早期基线提交，release 正文为 P1–P9 内容，作为历史快照保留。
-- `v1.0.1`：指向当前 `main` 头，为最新完整发布（**Latest**）。
 
 ---
 
