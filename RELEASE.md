@@ -1,4 +1,4 @@
-# LangChain & LangGraph 系统化实战教程 v1.0.0
+# LangChain & LangGraph 系统化实战教程 v1.0.1
 
 一套从零讲透「用 LangChain / LangGraph 造 Agent，并理解各框架共通的图编排本质」的双语实战教程。
 
