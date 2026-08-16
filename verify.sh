@@ -95,9 +95,12 @@ run_phase() {
   local p="$1"
   echo -e "\n${BLUE}=== Phase $p ===${NC}"
   local log="/tmp/verify_p${p}.log"
-  # macOS 没有 GNU `timeout`，用「后台进程 + sleep 后 kill」实现可移植超时
+  # macOS 没有 GNU `timeout`，用「后台进程 + sleep 后 kill」实现可移植超时。
+  # 注意：直接调用 .venv 里的 python，并用 nohup 让进程组忽略 SIGHUP——
+  # 原先走 `make run` 时，后台子 shell 里的 make 会收到 Hangup(1) 提前退出，
+  # 导致 Phase 11（会拉起 MCP server 子进程）等带子进程的 Phase 偶发失败。
   local timeout_sec=360
-  ( make run p="$p" > "$log" 2>&1 ) &
+  ( nohup ./.venv/bin/python -m "examples.p${p}.hello_chain" > "$log" 2>&1 ) &
   local pid=$!
   ( sleep "$timeout_sec"; kill -9 "$pid" 2>/dev/null ) &
   local watcher=$!
